@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>LIFF テスト</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h1>こんにちは</h1>
+  <p id="msg">読み込み中…</p>
+  <script>
+    const LIFF_ID = "2008862145-b9psDwoL";
+
+    async function main() {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+      const profile = await liff.getProfile();
+      document.getElementById("msg").textContent =
+        `ようこそ ${profile.displayName} さん`;
+    }
+    main();
+  </script>
+</body>
+</html>
