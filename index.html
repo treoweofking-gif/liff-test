@@ -39,7 +39,8 @@
 const userId = encodeURIComponent(profile.userId);
 
         // API URL 組み立て（iOS安全）
-        const url = API_BASE + "/api/me?line_user_id=" + userId;
+        const url = API_BASE + "/api/me?line_user_id=" + encodeURIComponent(profile.userId);
+
 
         // API 呼び出し
 // API 呼び出し
