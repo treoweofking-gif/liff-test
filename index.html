@@ -23,13 +23,13 @@
           return;
         }
 
-        const context = liff.getContext();
-        document.getElementById("app").innerText =
-          "ユーザーID取得: " + context.userId;
+    const context = liff.getContext();
+    const userId = encodeURIComponent(context.userId);
 
-        const res = await fetch(
-          `${API_BASE}/api/me?line_user_id=${context.userId}`
-        );
+    const res = await fetch(
+      `${API_BASE}/api/me?line_user_id=${userId}`
+   );
+
 
         const text = await res.text();
 
