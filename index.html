@@ -1,29 +1,54 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <title>LIFF Init Test</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <title>社内ポータル（テスト）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <div id="app">LIFF 初期化中…</div>
+  <h2>LIFF 初期化中…</h2>
+
+  <div id="app"></div>
 
   <script>
     const LIFF_ID = "2008866562-UCmyNOOE";
 
     async function main() {
       try {
-        console.log("init start");
+        // LIFF初期化
         await liff.init({ liffId: LIFF_ID });
-        console.log("init done");
 
-        document.getElementById("app").innerHTML =
-          "<h2>LIFF 初期化 完了</h2>";
+        // LINEアプリ外なら案内
+        if (!liff.isInClient()) {
+          document.getElementById("app").innerHTML =
+            "<p>LINEアプリ内から開いてください。</p>";
+          return;
+        }
+
+        // 未ログインならログイン
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+
+        // プロフィール取得
+        const profile = await liff.getProfile();
+        const context = liff.getContext();
+
+        document.querySelector("h2").innerText = "LIFF 初期化 完了";
+
+        // 表示
+        document.getElementById("app").innerHTML = `
+          <p>こんにちは <strong>${profile.displayName}</strong> さん</p>
+          <hr>
+          <p>表示名：${profile.displayName}</p>
+          <p>ユーザーID：${context.userId}</p>
+        `;
 
       } catch (e) {
         document.getElementById("app").innerHTML =
-          "<h2>LIFF エラー</h2><pre>" + e.message + "</pre>";
+          "<p>エラーが発生しました</p><pre>" + e.message + "</pre>";
       }
     }
 
