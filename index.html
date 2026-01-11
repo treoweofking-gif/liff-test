@@ -2,53 +2,75 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>社内ポータル（テスト）</title>
+  <title>社内ポータル</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <h2>LIFF 初期化中…</h2>
-
+  <h2 id="title">LIFF 初期化中…</h2>
   <div id="app"></div>
 
   <script>
     const LIFF_ID = "2008866562-UCmyNOOE";
+    const API_BASE = "https://あなたのAPIドメイン"; // ngrok or 本番API
 
     async function main() {
       try {
-        // LIFF初期化
+        // 1. LIFF 初期化
         await liff.init({ liffId: LIFF_ID });
 
-        // LINEアプリ外なら案内
         if (!liff.isInClient()) {
           document.getElementById("app").innerHTML =
             "<p>LINEアプリ内から開いてください。</p>";
           return;
         }
 
-        // 未ログインならログイン
         if (!liff.isLoggedIn()) {
           liff.login();
           return;
         }
 
-        // プロフィール取得
+        document.getElementById("title").innerText = "認証中…";
+
+        // 2. LINEユーザー情報取得
         const profile = await liff.getProfile();
         const context = liff.getContext();
+        const userId = encodeURIComponent(context.userId);
 
-        document.querySelector("h2").innerText = "LIFF 初期化 完了";
+        // 3. API呼び出し（社員判定）
+        const res = await fetch(
+          `${API_BASE}/api/me?line_user_id=${userId}`
+        );
 
-        // 表示
+        const data = await res.json();
+
+        // 4. 判定
+        if (!data.exists) {
+          document.getElementById("title").innerText = "利用できません";
+          document.getElementById("app").innerHTML = `
+            <p>
+              このアカウントは社内システムに登録されていません。<br>
+              管理者へお問い合わせください。
+            </p>
+          `;
+          return;
+        }
+
+        // 5. 社員だった場合
+        document.getElementById("title").innerText = "申請メニュー";
         document.getElementById("app").innerHTML = `
-          <p>こんにちは <strong>${profile.displayName}</strong> さん</p>
-          <hr>
-          <p>表示名：${profile.displayName}</p>
-          <p>ユーザーID：${context.userId}</p>
+          <p>ようこそ <strong>${profile.displayName}</strong> さん</p>
+          <ul>
+            <li>住所変更</li>
+            <li>扶養変更</li>
+            <li>就労証明</li>
+          </ul>
         `;
 
       } catch (e) {
+        document.getElementById("title").innerText = "エラー";
         document.getElementById("app").innerHTML =
-          "<p>エラーが発生しました</p><pre>" + e.message + "</pre>";
+          "<pre>" + e.message + "</pre>";
       }
     }
 
