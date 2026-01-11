@@ -12,11 +12,11 @@
 
   <script>
     const LIFF_ID = "2008866562-UCmyNOOE";
-    const API_BASE = "https://unshrined-cheekily-joaquin.ngrok-free.dev"; // ngrok or 本番API
+    const API_BASE = "https://unshrined-cheekily-joaquin.ngrok-free.dev";
 
     async function main() {
       try {
-        // 1. LIFF 初期化
+        // LIFF初期化
         await liff.init({ liffId: LIFF_ID });
 
         if (!liff.isInClient()) {
@@ -32,24 +32,27 @@
 
         document.getElementById("title").innerText = "認証中…";
 
-        // 2. LINEユーザー情報取得
+        // ユーザー情報取得
         const profile = await liff.getProfile();
         const context = liff.getContext();
         const userId = encodeURIComponent(context.userId);
 
-        // 3. API呼び出し（社員判定）
-        const res = await fetch(
-          `${API_BASE}/api/me?line_user_id=${userId}`
-        );
+        // API URL 組み立て（iOS安全）
+        const url = API_BASE + "/api/me?line_user_id=" + userId;
 
-        const data = await res.json();
+        // API 呼び出し
+        const res = await fetch(url);
+        const text = await res.text();
 
+        // デバッグ表示（必ず一度は通る）
         document.getElementById("app").innerHTML = `
-  <h3>APIレスポンス確認</h3>
-  <pre>${text}</pre>
-`;
+          <h3>APIレスポンス確認</h3>
+          <pre>${text}</pre>
+        `;
 
-        // 4. 判定
+        const data = JSON.parse(text);
+
+        // 社員でない場合
         if (!data.exists) {
           document.getElementById("title").innerText = "利用できません";
           document.getElementById("app").innerHTML = `
@@ -61,7 +64,7 @@
           return;
         }
 
-        // 5. 社員だった場合
+        // 社員だった場合
         document.getElementById("title").innerText = "申請メニュー";
         document.getElementById("app").innerHTML = `
           <p>ようこそ <strong>${profile.displayName}</strong> さん</p>
