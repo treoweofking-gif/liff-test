@@ -44,6 +44,11 @@
 
         const data = await res.json();
 
+        document.getElementById("app").innerHTML = `
+  <h3>APIレスポンス確認</h3>
+  <pre>${text}</pre>
+`;
+
         // 4. 判定
         if (!data.exists) {
           document.getElementById("title").innerText = "利用できません";
