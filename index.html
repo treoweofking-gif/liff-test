@@ -33,8 +33,17 @@
 
         const text = await res.text();
 
-        document.getElementById("app").innerHTML =
-          "<h3>API生レスポンス</h3><pre>" + text + "</pre>";
+if (text.includes('"exists":false')) {
+  document.getElementById("app").innerHTML = `
+    <h2>利用できません</h2>
+    <p>
+      このアカウントは社内システムに登録されていません。<br>
+      管理者へお問い合わせください。
+    </p>
+  `;
+  return;
+}
+
 
       } catch (e) {
         document.getElementById("app").innerHTML =
