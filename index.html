@@ -42,16 +42,24 @@ const userId = encodeURIComponent(profile.userId);
         const url = API_BASE + "/api/me?line_user_id=" + userId;
 
         // API 呼び出し
-        const res = await fetch(url);
-        const text = await res.text();
+// API 呼び出し
+const res = await fetch(url);
+const text = await res.text();
 
-        // デバッグ表示（必ず一度は通る）
-        document.getElementById("app").innerHTML = `
-          <h3>APIレスポンス確認</h3>
-          <pre>${text}</pre>
-        `;
+// まず生レスポンスを表示（重要）
+document.getElementById("app").innerHTML = `
+  <h3>APIレスポンス（生）</h3>
+  <pre>${text}</pre>
+`;
 
-        const data = JSON.parse(text);
+// JSONでない場合はここで止める
+if (!text.trim().startsWith("{")) {
+  throw new Error("APIがJSONを返していません");
+}
+
+// JSONなら解析
+const data = JSON.parse(text);
+
 
         // 社員でない場合
         if (!data.exists) {
