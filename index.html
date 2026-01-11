@@ -18,9 +18,15 @@
         liff.login();
         return;
       }
-      const profile = await liff.getProfile();
-      document.getElementById("msg").textContent =
-        `ようこそ ${profile.displayName} さん`;
+    const profile = await liff.getProfile();
+    const context = liff.getContext(); // ← 追加
+
+    document.getElementById("msg").innerHTML = `
+     ようこそ ${profile.displayName} さん<br><br>
+     あなたのLINEユーザーID：<br>
+  <code>${context.userId}</code>
+`;
+
     }
     main();
   </script>
