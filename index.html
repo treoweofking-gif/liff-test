@@ -19,6 +19,8 @@
         // LIFF初期化
         await liff.init({ liffId: LIFF_ID });
 
+            document.getElementById("title").innerText = "LIFF init OK";
+
         if (!liff.isInClient()) {
           document.getElementById("app").innerHTML =
             "<p>LINEアプリ内から開いてください。</p>";
