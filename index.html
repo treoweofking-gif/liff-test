@@ -18,6 +18,13 @@
         document.getElementById("app").innerText = "LIFF 初期化中...";
         await liff.init({ liffId: LIFF_ID });
 
+        if (!liff.isInClient()) {
+  document.getElementById("app").innerHTML =
+    "<h2>LINEアプリ内から開いてください</h2>";
+  return;
+}
+
+
         if (!liff.isLoggedIn()) {
           liff.login();
           return;
