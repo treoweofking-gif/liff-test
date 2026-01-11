@@ -4,31 +4,52 @@
   <meta charset="utf-8">
   <title>LIFF テスト</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-</head>
-<body>
-  <h1>こんにちは</h1>
-  <p id="msg">読み込み中…</p>
-  <script>
-    const LIFF_ID = "2008862145-b9psDwoL";
+<script>
+  const LIFF_ID = "2008862145-b9psDwoL";
+  const API_BASE = "https://unshrined-cheekily-joaquin.ngrok-free.dev";
 
-    async function main() {
-      await liff.init({ liffId: LIFF_ID });
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-    const profile = await liff.getProfile();
-    const context = liff.getContext(); // ← 追加
+  async function main() {
+    await liff.init({ liffId: LIFF_ID });
 
-    document.getElementById("msg").innerHTML = `
-     ようこそ ${profile.displayName} さん<br><br>
-     あなたのLINEユーザーID：<br>
-  <code>${context.userId}</code>
-`;
-
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
     }
-    main();
-  </script>
+
+    const profile = await liff.getProfile();
+    const context = liff.getContext();
+
+    const res = await fetch(
+      `${API_BASE}/api/me?line_user_id=${context.userId}`
+    );
+
+    if (!res.ok) {
+      document.getElementById("app").innerHTML =
+        "<h2>このアカウントは利用できません</h2>";
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!data.exists) {
+      document.getElementById("app").innerHTML =
+        "<h2>このアカウントは利用できません</h2>";
+      return;
+    }
+
+    document.getElementById("app").innerHTML = `
+      <h2>申請メニュー</h2>
+      <p>ようこそ ${profile.displayName} さん</p>
+
+      <ul>
+        <li><a href="#">住所変更</a></li>
+        <li><a href="#">扶養変更</a></li>
+        <li><a href="#">就労証明</a></li>
+      </ul>
+    `;
+  }
+
+  main();
+</script>
 </body>
 </html>
