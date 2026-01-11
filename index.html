@@ -34,8 +34,8 @@
 
         // ユーザー情報取得
         const profile = await liff.getProfile();
-        const context = liff.getContext();
-        const userId = encodeURIComponent(context.userId);
+        const profile = await liff.getProfile();
+const userId = encodeURIComponent(profile.userId);
 
         // API URL 組み立て（iOS安全）
         const url = API_BASE + "/api/me?line_user_id=" + userId;
