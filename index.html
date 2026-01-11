@@ -1,64 +1,53 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <title>LIFF テスト</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-</head>
+<script>
+  const LIFF_ID = "2008862145-b9psDwoL";
+  const API_BASE = "https://unshrined-cheekily-joaquin.ngrok-free.dev";
+  const app = document.getElementById("app");
 
-<body>
-  <div id="app">
-    <p>読み込み中…</p>
-  </div>
-
-  <script>
-    console.log("JS start");
-    const LIFF_ID = "2008862145-b9psDwoL";
-    const API_BASE = "https://unshrined-cheekily-joaquin.ngrok-free.dev";
-
-    async function main() {
+  async function main() {
+    try {
+      app.innerHTML = "<p>① liff.init 開始</p>";
       await liff.init({ liffId: LIFF_ID });
 
+      app.innerHTML += "<p>② login確認</p>";
       if (!liff.isLoggedIn()) {
+        app.innerHTML += "<p>③ login 実行</p>";
         liff.login();
         return;
       }
 
+      app.innerHTML += "<p>④ profile取得</p>";
       const profile = await liff.getProfile();
       const context = liff.getContext();
 
+      app.innerHTML += "<p>⑤ API呼び出し</p>";
       const res = await fetch(
         `${API_BASE}/api/me?line_user_id=${context.userId}`
       );
 
-      if (!res.ok) {
-        document.getElementById("app").innerHTML =
-          "<h2>このアカウントは利用できません</h2>";
-        return;
-      }
-
+      app.innerHTML += "<p>⑥ API応答</p>";
       const data = await res.json();
 
       if (!data.exists) {
-        document.getElementById("app").innerHTML =
-          "<h2>このアカウントは利用できません</h2>";
+        app.innerHTML = "<h2>このアカウントは利用できません</h2>";
         return;
       }
 
-      document.getElementById("app").innerHTML = `
+      app.innerHTML = `
         <h2>申請メニュー</h2>
         <p>ようこそ ${profile.displayName} さん</p>
-
         <ul>
           <li>住所変更</li>
           <li>扶養変更</li>
           <li>就労証明</li>
         </ul>
       `;
+    } catch (e) {
+      app.innerHTML = `
+        <h2>エラーが発生しました</h2>
+        <pre>${e}</pre>
+      `;
     }
+  }
 
-    main();
-  </script>
-</body>
-</html>
+  main();
+</script>
