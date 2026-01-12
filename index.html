@@ -34,14 +34,14 @@
       setMsg("1) LIFF 初期化中...");
       await liff.init({ liffId: "2008866562-UCmyNOOE" });
 
-      setMsg("2) isLoggedIn=" + liff.isLoggedIn());
+      addMsg("2) isLoggedIn=" + liff.isLoggedIn());
       if (!liff.isLoggedIn()) {
         setMsg("3) 未ログイン→loginへ遷移します");
         liff.login();
         return;
       }
 
-      setMsg("4) getProfile中...");
+      addMsg("4) getProfile中...");
 const profile = await liff.getProfile();
 
 // ★ここで userId を変数に保持
@@ -50,7 +50,7 @@ const userId = profile.userId;
 // ★ここは上書きではなく追記（消えない）
 addMsg("5) userId=" + userId);
 
-setMsg("6) /api/me 呼び出し中...");
+addMsg("6) /api/me 呼び出し中...");
 const res = await fetch(
   "https://liff-api.onrender.com/api/me?line_user_id=" + userId
 );
