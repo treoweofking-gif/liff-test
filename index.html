@@ -7,7 +7,7 @@
 </head>
 <body>
   <h1>社内ポータル</h1>
-  <div id="message">起動中...</div>
+  <div id="message" style="white-space: pre-wrap;">起動中...</div>
 
   <ul id="menu" style="display:none;">
     <li>📄 休暇申請</li>
@@ -21,7 +21,9 @@
   <!-- ★sdk.js の「後」に置く -->
   <script>
     async function init() {
-      const msg = (t) => (document.getElementById("message").innerText = t);
+      const el = document.getElementById("message");
+      const setMsg = (t) => { el.textContent = t; };
+      const addMsg = (t) => { el.textContent += "\n" + t; };
 
       try {
         if (typeof liff === "undefined") {
@@ -49,14 +51,16 @@
         );
         const data = await res.json();
 
-        msg("7) exists=" + data.exists);
-        document.getElementById("message").innerText += "\n" + JSON.stringify(data);
+        setMsg("7) exists=" + data.exists);
+        addMsg("API raw:\n" + JSON.stringify(data, null, 2));
+
         if (data.exists === true) {
           document.getElementById("menu").style.display = "block";
-          msg("8) 認証OK：申請書メニュー表示");
+          addMsg("8) 認証OK：申請書メニュー表示");
         } else {
-          msg("8) 未登録：管理部へ連絡してください");
+          addMsg("8) 未登録：管理部へ連絡してください");
         }
+
       } catch (e) {
         msg("エラー: " + (e && e.message ? e.message : e));
       }
