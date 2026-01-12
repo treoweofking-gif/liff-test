@@ -19,54 +19,54 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <!-- ★sdk.js の「後」に置く -->
-  <script>
-    async function init() {
-      const el = document.getElementById("message");
-      const setMsg = (t) => { el.textContent = t; };
-      const addMsg = (t) => { el.textContent += "\n" + t; };
+<script>
+  async function init() {
+    const el = document.getElementById("message");
+    const setMsg = (t) => { el.textContent = t; };
+    const addMsg = (t) => { el.textContent += "\n" + t; };
 
-      try {
-        if (typeof liff === "undefined") {
-          msg("エラー: LIFF SDK が読み込めていません（liff が未定義）");
-          return;
-        }
-
-        msg("1) LIFF 初期化中...");
-        await liff.init({ liffId: "2008866562-UCmyNOOE" });
-
-        msg("2) isLoggedIn=" + liff.isLoggedIn());
-        if (!liff.isLoggedIn()) {
-          msg("3) 未ログイン→loginへ遷移します");
-          liff.login();
-          return;
-        }
-
-        msg("4) getProfile中...");
-        const profile = await liff.getProfile();
-        msg("5) userId=" + profile.userId);
-
-        msg("6) /api/me 呼び出し中...");
-        const res = await fetch(
-          "https://liff-api.onrender.com/api/me?line_user_id=" + profile.userId
-        );
-        const data = await res.json();
-
-        setMsg("7) exists=" + data.exists);
-        addMsg("API raw:\n" + JSON.stringify(data, null, 2));
-
-        if (data.exists === true) {
-          document.getElementById("menu").style.display = "block";
-          addMsg("8) 認証OK：申請書メニュー表示");
-        } else {
-          addMsg("8) 未登録：管理部へ連絡してください");
-        }
-
-      } catch (e) {
-        msg("エラー: " + (e && e.message ? e.message : e));
+    try {
+      if (typeof liff === "undefined") {
+        setMsg("エラー: LIFF SDK が読み込めていません（liff が未定義）");
+        return;
       }
-    }
 
-    init();
-  </script>
+      setMsg("1) LIFF 初期化中...");
+      await liff.init({ liffId: "2008866562-UCmyNOOE" });
+
+      setMsg("2) isLoggedIn=" + liff.isLoggedIn());
+      if (!liff.isLoggedIn()) {
+        setMsg("3) 未ログイン→loginへ遷移します");
+        liff.login();
+        return;
+      }
+
+      setMsg("4) getProfile中...");
+      const profile = await liff.getProfile();
+      setMsg("5) userId=" + profile.userId);
+
+      setMsg("6) /api/me 呼び出し中...");
+      const res = await fetch(
+        "https://liff-api.onrender.com/api/me?line_user_id=" + profile.userId
+      );
+      const data = await res.json();
+
+      setMsg("7) exists=" + data.exists);
+      addMsg("API raw:\n" + JSON.stringify(data, null, 2));
+
+      if (data.exists === true) {
+        document.getElementById("menu").style.display = "block";
+        addMsg("8) 認証OK：申請書メニュー表示");
+      } else {
+        addMsg("8) 未登録：管理部へ連絡してください");
+      }
+
+    } catch (e) {
+      setMsg("エラー: " + (e && e.message ? e.message : e));
+    }
+  }
+
+  init();
+</script>
 </body>
 </html>
