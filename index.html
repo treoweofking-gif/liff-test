@@ -4,95 +4,29 @@
   <meta charset="utf-8">
   <title>社内ポータル</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-</head>
-<body>
-  <h2 id="title">LIFF 初期化中…</h2>
-  <div id="app"></div>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-  <script>
-    const LIFF_ID = "2008866562-UCmyNOOE";
-    const API_BASE = "https://liff-api.onrender.com";
+<script>
+  async function initLiff() {
+    await liff.init({ liffId: "2008866562-UCmyNOOE" });
 
-    async function main() {
-      try {
-        // LIFF初期化
-        await liff.init({ liffId: LIFF_ID });
-
-            document.getElementById("title").innerText = "LIFF init OK";
-
-        if (!liff.isInClient()) {
-          document.getElementById("app").innerHTML =
-            "<p>LINEアプリ内から開いてください。</p>";
-          return;
-        }
-
-        if (!liff.isLoggedIn()) {
-          liff.login();
-          return;
-        }
-
-        document.getElementById("title").innerText = "認証中…";
-
-        // ユーザー情報取得
-        const profile = await liff.getProfile();
-const userId = encodeURIComponent(profile.userId);
-
-        // API URL 組み立て（iOS安全）
-        const url = API_BASE + "/api/me?line_user_id=" + encodeURIComponent(profile.userId);
-
-
-        // API 呼び出し
-// API 呼び出し
-const res = await fetch(url);
-const text = await res.text();
-
-// まず生レスポンスを表示（重要）
-document.getElementById("app").innerHTML = `
-  <h3>APIレスポンス（生）</h3>
-  <pre>${text}</pre>
-`;
-
-// JSONでない場合はここで止める
-if (!text.trim().startsWith("{")) {
-  throw new Error("APIがJSONを返していません");
-}
-
-// JSONなら解析
-const data = JSON.parse(text);
-
-
-        // 社員でない場合
-        if (!data.exists) {
-          document.getElementById("title").innerText = "利用できません";
-          document.getElementById("app").innerHTML = `
-            <p>
-              このアカウントは社内システムに登録されていません。<br>
-              管理者へお問い合わせください。
-            </p>
-          `;
-          return;
-        }
-
-        // 社員だった場合
-        document.getElementById("title").innerText = "申請メニュー";
-        document.getElementById("app").innerHTML = `
-          <p>ようこそ <strong>${profile.displayName}</strong> さん</p>
-          <ul>
-            <li>住所変更</li>
-            <li>扶養変更</li>
-            <li>就労証明</li>
-          </ul>
-        `;
-
-      } catch (e) {
-        document.getElementById("title").innerText = "エラー";
-        document.getElementById("app").innerHTML =
-          "<pre>" + e.message + "</pre>";
-      }
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
     }
 
-    main();
-  </script>
+    const profile = await liff.getProfile();
+    console.log("LINE userId:", profile.userId);
+
+    const res = await fetch(
+      "https://https://liff-api.onrender.com/api/me?line_user_id=" + profile.userId
+    );
+    const data = await res.json();
+
+    console.log("API response:", data);
+  }
+
+  initLiff();
+</script>
 </body>
 </html>
