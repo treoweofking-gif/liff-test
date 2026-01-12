@@ -15,51 +15,43 @@
     <li>🏠 住所変更届</li>
   </ul>
 
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+  async function init() {
+    const msg = (t) => { document.getElementById("message").innerText = t; };
 
-  <script>
-    async function init() {
-      try {
-        document.getElementById("message").innerText = "LIFF 初期化中";
+    try {
+      msg("1) LIFF 初期化中...");
+      await liff.init({ liffId: "2008866562-UCmyNOOE" });
 
-        await liff.init({ liffId: "2008866562-UCmyNOOE" });
+      msg("2) isLoggedIn=" + liff.isLoggedIn());
 
-        if (!liff.isLoggedIn()) {
-          document.getElementById("message").innerText = "LINEログインへ遷移";
-          liff.login();
-          return;
-        }
-
-        document.getElementById("message").innerText = "ユーザー情報取得中";
-
-        const profile = await liff.getProfile();
-        const userId = profile.userId;
-
-        document.getElementById("message").innerText =
-          "認証確認中: " + userId;
-
-        const res = await fetch(
-          "https://liff-api.onrender.com/api/me?line_user_id=" + userId
-        );
-
-        const data = await res.json();
-
-        if (data.exists === true) {
-          document.getElementById("message").innerText =
-            "認証OK：申請書メニューを表示します";
-          document.getElementById("menu").style.display = "block";
-        } else {
-          document.getElementById("message").innerText =
-            "社員登録が確認できません。管理部へ連絡してください。";
-        }
-
-      } catch (e) {
-        document.getElementById("message").innerText =
-          "エラー発生: " + e.message;
+      if (!liff.isLoggedIn()) {
+        msg("3) 未ログイン→loginへ遷移します");
+        liff.login(); // ここで画面が遷移するのが正常
+        return;
       }
-    }
 
-    init();
-  </script>
+      msg("4) getProfile中...");
+      const profile = await liff.getProfile();
+      msg("5) userId=" + profile.userId);
+
+      msg("6) /api/me 呼び出し中...");
+      const res = await fetch(
+        "https://liff-api.onrender.com/api/me?line_user_id=" + profile.userId
+      );
+      const data = await res.json();
+
+      msg("7) exists=" + data.exists);
+
+      if (data.exists === true) {
+        document.getElementById("menu").style.display = "block";
+      }
+    } catch (e) {
+      document.getElementById("message").innerText = "エラー: " + e.message;
+    }
+  }
+
+  init();
+</script>
 </body>
 </html>
