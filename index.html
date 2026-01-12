@@ -62,6 +62,8 @@ addMsg("API raw:\n" + JSON.stringify(data, null, 2));
 
 
       if (data.exists === true) {
+        document.getElementById("menu").style.display = "block";
+        
         document.getElementById("btn-leave").onclick = () => {
   document.getElementById("message").textContent = "休暇申請（次でフォーム化します）";
   document.getElementById("menu").style.display = "none";
