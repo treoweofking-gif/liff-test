@@ -9,11 +9,11 @@
   <h1>社内ポータル</h1>
   <div id="message" style="white-space: pre-wrap;">起動中...</div>
 
-  <ul id="menu" style="display:none;">
-    <li>📄 休暇申請</li>
-    <li>⏱ 残業申請</li>
-    <li>🏠 住所変更届</li>
-  </ul>
+<ul id="menu" style="display:none;">
+  <li><button id="btn-leave">📄 休暇申請</button></li>
+  <li><button id="btn-ot">⏱ 残業申請</button></li>
+  <li><button id="btn-addr">🏠 住所変更届</button></li>
+</ul>
 
   <!-- ★これが無いと liff が存在しません -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -62,7 +62,21 @@ addMsg("API raw:\n" + JSON.stringify(data, null, 2));
 
 
       if (data.exists === true) {
-        document.getElementById("menu").style.display = "block";
+        document.getElementById("btn-leave").onclick = () => {
+  document.getElementById("message").textContent = "休暇申請（次でフォーム化します）";
+  document.getElementById("menu").style.display = "none";
+};
+
+document.getElementById("btn-ot").onclick = () => {
+  document.getElementById("message").textContent = "残業申請（次でフォーム化します）";
+  document.getElementById("menu").style.display = "none";
+};
+
+document.getElementById("btn-addr").onclick = () => {
+  document.getElementById("message").textContent = "住所変更届（次でフォーム化します）";
+  document.getElementById("menu").style.display = "none";
+};
+
         addMsg("8) 認証OK：申請書メニュー表示");
       } else {
         addMsg("8) 未登録：管理部へ連絡してください");
