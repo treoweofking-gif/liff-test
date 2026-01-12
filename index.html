@@ -42,17 +42,24 @@
       }
 
       setMsg("4) getProfile中...");
-      const profile = await liff.getProfile();
-      setMsg("5) userId=" + profile.userId);
+const profile = await liff.getProfile();
 
-      setMsg("6) /api/me 呼び出し中...");
-      const res = await fetch(
-        "https://liff-api.onrender.com/api/me?line_user_id=" + profile.userId
-      );
-      const data = await res.json();
+// ★ここで userId を変数に保持
+const userId = profile.userId;
 
-      setMsg("7) exists=" + data.exists);
-      addMsg("API raw:\n" + JSON.stringify(data, null, 2));
+// ★ここは上書きではなく追記（消えない）
+addMsg("5) userId=" + userId);
+
+setMsg("6) /api/me 呼び出し中...");
+const res = await fetch(
+  "https://liff-api.onrender.com/api/me?line_user_id=" + userId
+);
+const data = await res.json();
+
+// ★ここも追記（消えない）
+addMsg("7) exists=" + data.exists);
+addMsg("API raw:\n" + JSON.stringify(data, null, 2));
+
 
       if (data.exists === true) {
         document.getElementById("menu").style.display = "block";
