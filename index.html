@@ -16,10 +16,7 @@
 </ul>
 
   <!-- ★これが無いと liff が存在しません -->
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
-  <!-- ★sdk.js の「後」に置く -->
-<script>
+  <script>
   async function init() {
     const el = document.getElementById("message");
     const setMsg = (t) => { el.textContent = t; };
@@ -36,75 +33,68 @@
 
       addMsg("2) isLoggedIn=" + liff.isLoggedIn());
       if (!liff.isLoggedIn()) {
-        setMsg("3) 未ログイン→loginへ遷移します");
+        addMsg("3) 未ログイン→loginへ遷移します");
         liff.login();
         return;
       }
 
       addMsg("4) getProfile中...");
-const profile = await liff.getProfile();
+      const profile = await liff.getProfile();
+      const userId = profile.userId;
+      addMsg("5) userId=" + userId);
 
-// ★ここで userId を変数に保持
-const userId = profile.userId;
+      addMsg("6) /api/me 呼び出し中...");
+      const res = await fetch(
+        "https://liff-api.onrender.com/api/me?line_user_id=" + userId
+      );
+      const data = await res.json();
 
-// ★ここは上書きではなく追記（消えない）
-addMsg("5) userId=" + userId);
+      addMsg("7) exists=" + data.exists);
+      addMsg("API raw:\n" + JSON.stringify(data, null, 2));
 
-addMsg("6) /api/me 呼び出し中...");
-const res = await fetch(
-  "https://liff-api.onrender.com/api/me?line_user_id=" + userId
-);
-const data = await res.json();
+      if (data.exists === true) {
+        const params = new URLSearchParams(location.search);
+        const p = params.get("p");
 
-// ★ここも追記（消えない）
-addMsg("7) exists=" + data.exists);
-addMsg("API raw:\n" + JSON.stringify(data, null, 
-                                     
-if (data.exists === true) {
-  const params = new URLSearchParams(location.search);
-  const p = params.get("p");
+        // 住所変更ページ（リッチメニューから p=address で来たとき）
+        if (p === "address") {
+          document.getElementById("menu").style.display = "none";
+          addMsg("8) 認証OK：住所変更フロー");
+          addMsg("住所変更となった運転免許証または住民票の写真を送ってください。");
 
-  // 住所変更ページ（リッチメニューから p=address で来たとき）
-  if (p === "address") {
-    document.getElementById("menu").style.display = "none";
-    addMsg("8) 認証OK：住所変更フロー");
-    addMsg("住所変更となった運転免許証または住民票の写真を送ってください。");
+          const btn = document.createElement("button");
+          btn.textContent = "住所変更を開始（トークへ送信）";
+          btn.onclick = async () => {
+            await liff.sendMessages([{ type: "text", text: "住所変更を申請します" }]);
+            liff.closeWindow();
+          };
+          document.body.appendChild(btn);
 
-    const btn = document.createElement("button");
-    btn.textContent = "住所変更を開始（トークへ送信）";
-    btn.onclick = async () => {
-      await liff.sendMessages([{ type: "text", text: "住所変更を申請します" }]);
-      liff.closeWindow();
-    };
-    document.body.appendChild(btn);
+          return; // ここで止める（メニュー一覧は出さない）
+        }
 
-    return; // ここで止める（メニュー一覧は出さない）
-  }
+        // 通常のメニュー表示
+        document.getElementById("menu").style.display = "block";
 
-  // それ以外は通常のメニュー表示
-  document.getElementById("menu").style.display = "block";
+        document.getElementById("btn-leave").onclick = () => {
+          document.getElementById("message").textContent = "休暇申請（次でフォーム化します）";
+          document.getElementById("menu").style.display = "none";
+        };
 
-  document.getElementById("btn-leave").onclick = () => {
-    document.getElementById("message").textContent = "休暇申請（次でフォーム化します）";
-    document.getElementById("menu").style.display = "none";
-  };
+        document.getElementById("btn-ot").onclick = () => {
+          document.getElementById("message").textContent = "残業申請（次でフォーム化します）";
+          document.getElementById("menu").style.display = "none";
+        };
 
-  document.getElementById("btn-ot").onclick = () => {
-    document.getElementById("message").textContent = "残業申請（次でフォーム化します）";
-    document.getElementById("menu").style.display = "none";
-  };
+        document.getElementById("btn-addr").onclick = () => {
+          document.getElementById("message").textContent = "住所変更は下メニューから開始してください";
+          document.getElementById("menu").style.display = "none";
+        };
 
-  document.getElementById("btn-addr").onclick = () => {
-    // 住所変更はリッチメニューから来る想定なので案内だけ
-    document.getElementById("message").textContent = "住所変更は下メニューから開始してください";
-    document.getElementById("menu").style.display = "none";
-  };
-
-  addMsg("8) 認証OK：申請書メニュー表示");
-} else {
-  addMsg("8) 未登録：管理部へ連絡してください");
-}
-
+        addMsg("8) 認証OK：申請書メニュー表示");
+      } else {
+        addMsg("8) 未登録：管理部へ連絡してください");
+      }
 
     } catch (e) {
       setMsg("エラー: " + (e && e.message ? e.message : e));
