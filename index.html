@@ -61,7 +61,25 @@ addMsg("7) exists=" + data.exists);
 addMsg("API raw:\n" + JSON.stringify(data, null, 2));
 
 
-      if (data.exists === true) {
+      if (data.exists === true)
+        
+        const params = new URLSearchParams(location.search);
+const p = params.get("p");
+
+if (p === "address") {
+  document.getElementById("menu").style.display = "none";
+  addMsg("住所変更：運転免許証または住民票の写真をトークに送ってください。");
+
+  const btn = document.createElement("button");
+  btn.textContent = "住所変更を開始（トークへ送信）";
+  btn.onclick = async () => {
+    await liff.sendMessages([{ type: "text", text: "住所変更を申請します" }]);
+    liff.closeWindow();
+  };
+  document.body.appendChild(btn);
+
+  return;
+}{
         document.getElementById("menu").style.display = "block";
         
         document.getElementById("btn-leave").onclick = () => {
