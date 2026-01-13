@@ -58,49 +58,53 @@ const data = await res.json();
 
 // ★ここも追記（消えない）
 addMsg("7) exists=" + data.exists);
-addMsg("API raw:\n" + JSON.stringify(data, null, 2));
+addMsg("API raw:\n" + JSON.stringify(data, null, 
+                                     
+if (data.exists === true) {
+  const params = new URLSearchParams(location.search);
+  const p = params.get("p");
 
+  // 住所変更ページ（リッチメニューから p=address で来たとき）
+  if (p === "address") {
+    document.getElementById("menu").style.display = "none";
+    addMsg("8) 認証OK：住所変更フロー");
+    addMsg("住所変更となった運転免許証または住民票の写真を送ってください。");
 
-      if (data.exists === true)
-        
-        const params = new URLSearchParams(location.search);
-const p = params.get("p");
+    const btn = document.createElement("button");
+    btn.textContent = "住所変更を開始（トークへ送信）";
+    btn.onclick = async () => {
+      await liff.sendMessages([{ type: "text", text: "住所変更を申請します" }]);
+      liff.closeWindow();
+    };
+    document.body.appendChild(btn);
 
-if (p === "address") {
-  document.getElementById("menu").style.display = "none";
-  addMsg("住所変更：運転免許証または住民票の写真をトークに送ってください。");
+    return; // ここで止める（メニュー一覧は出さない）
+  }
 
-  const btn = document.createElement("button");
-  btn.textContent = "住所変更を開始（トークへ送信）";
-  btn.onclick = async () => {
-    await liff.sendMessages([{ type: "text", text: "住所変更を申請します" }]);
-    liff.closeWindow();
+  // それ以外は通常のメニュー表示
+  document.getElementById("menu").style.display = "block";
+
+  document.getElementById("btn-leave").onclick = () => {
+    document.getElementById("message").textContent = "休暇申請（次でフォーム化します）";
+    document.getElementById("menu").style.display = "none";
   };
-  document.body.appendChild(btn);
 
-  return;
-}{
-        document.getElementById("menu").style.display = "block";
-        
-        document.getElementById("btn-leave").onclick = () => {
-  document.getElementById("message").textContent = "休暇申請（次でフォーム化します）";
-  document.getElementById("menu").style.display = "none";
-};
+  document.getElementById("btn-ot").onclick = () => {
+    document.getElementById("message").textContent = "残業申請（次でフォーム化します）";
+    document.getElementById("menu").style.display = "none";
+  };
 
-document.getElementById("btn-ot").onclick = () => {
-  document.getElementById("message").textContent = "残業申請（次でフォーム化します）";
-  document.getElementById("menu").style.display = "none";
-};
+  document.getElementById("btn-addr").onclick = () => {
+    // 住所変更はリッチメニューから来る想定なので案内だけ
+    document.getElementById("message").textContent = "住所変更は下メニューから開始してください";
+    document.getElementById("menu").style.display = "none";
+  };
 
-document.getElementById("btn-addr").onclick = () => {
-  document.getElementById("message").textContent = "住所変更届（次でフォーム化します）";
-  document.getElementById("menu").style.display = "none";
-};
+  addMsg("8) 認証OK：申請書メニュー表示");
+} else {
+  addMsg("8) 未登録：管理部へ連絡してください");
+}
 
-        addMsg("8) 認証OK：申請書メニュー表示");
-      } else {
-        addMsg("8) 未登録：管理部へ連絡してください");
-      }
 
     } catch (e) {
       setMsg("エラー: " + (e && e.message ? e.message : e));
