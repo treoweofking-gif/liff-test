@@ -51,7 +51,7 @@
       const data = await res.json();
 
       addMsg("7) exists=" + data.exists);
-      addMsg("API raw:\n" + JSON.stringify(data, null, 2));
+      // addMsg("API raw:\n" + JSON.stringify(data, null, 2));
 
       if (data.exists === true) {
         const params = new URLSearchParams(location.search);
