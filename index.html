@@ -64,12 +64,30 @@
           addMsg("住所変更となった運転免許証または住民票の写真を送ってください。");
 
           const btn = document.createElement("button");
-          btn.textContent = "住所変更を開始（トークへ送信）";
-          btn.onclick = async () => {
-            await liff.sendMessages([{ type: "text", text: "住所変更を申請します" }]);
-            liff.closeWindow();
-          };
-          document.body.appendChild(btn);
+btn.textContent = "住所変更を開始（トークへ送信）";
+btn.style.position = "fixed";
+btn.style.left = "12px";
+btn.style.right = "12px";
+btn.style.bottom = "12px";
+btn.style.height = "56px";
+btn.style.fontSize = "16px";
+btn.style.zIndex = "9999";   // これで他の要素に負けない
+btn.style.borderRadius = "10px";
+
+btn.onclick = async () => {
+  try {
+    addMsg("送信中...");
+    await liff.sendMessages([{ type: "text", text: "住所変更を申請します" }]);
+    addMsg("送信OK（トークを確認してください）");
+    liff.closeWindow();
+  } catch (e) {
+    addMsg("送信エラー: " + (e?.message || e));
+  }
+};
+
+document.body.appendChild(btn);
+
+          
 
           return; // ここで止める（メニュー一覧は出さない）
         }
